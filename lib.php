@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Completion Progress block common configuration and helper functions
+ * Courses Available block common configuration and helper functions
  *
- * @package    block_completion_progress
- * @copyright  2016 Michael de Raadt
+ * @package    block_courses_available
+ * @copyright  2017 Ian Wild
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -27,15 +27,6 @@ defined('MOODLE_INTERNAL') || die;
 require_once($CFG->libdir.'/completionlib.php');
 
 // Global defaults.
-const DEFAULT_COMPLETIONPROGRESS_WRAPAFTER = 16;
-const DEFAULT_COMPLETIONPROGRESS_LONGBARS = 'squeeze';
-const DEFAULT_COMPLETIONPROGRESS_SCROLLCELLWIDTH = 25;
-const DEFAULT_COMPLETIONPROGRESS_COURSENAMETOSHOW = 'shortname';
-const DEFAULT_COMPLETIONPROGRESS_SHOWINACTIVE = 0;
-const DEFAULT_COMPLETIONPROGRESS_PROGRESSBARICONS = 0;
-const DEFAULT_COMPLETIONPROGRESS_ORDERBY = 'orderbytime';
-const DEFAULT_COMPLETIONPROGRESS_SHOWPERCENTAGE = 0;
-const DEFAULT_COMPLETIONPROGRESS_ACTIVITIESINCLUDED = 'activitycompletion';
 
 /**
  * Finds submissions for a user in a course
@@ -44,7 +35,7 @@ const DEFAULT_COMPLETIONPROGRESS_ACTIVITIESINCLUDED = 'activitycompletion';
  * @param int    userid   ID of user in the course
  * @return array Course module IDS submissions
  */
-function block_completion_progress_student_submissions($courseid, $userid) {
+function block_courses_available_student_submissions($courseid, $userid) {
     global $DB;
 
     $submissions = array();
@@ -88,7 +79,7 @@ function block_completion_progress_student_submissions($courseid, $userid) {
  * @param int    courseid   ID of the course
  * @return array Mapping of userid-cmid pairs for submissions
  */
-function block_completion_progress_course_submissions($courseid) {
+function block_courses_available_course_submissions($courseid) {
     global $DB;
 
     $submissions = array();
@@ -125,41 +116,6 @@ function block_completion_progress_course_submissions($courseid) {
 }
 
 /**
- * Returns the alternate links for teachers
- *
- * @return array URLs and associated capabilities, per activity
- */
-function block_completion_progress_modules_with_alternate_links() {
-    global $CFG;
-
-    $alternatelinks = array(
-        'assign' => array(
-            'url' => '/mod/assign/view.php?id=:cmid&action=grading',
-            'capability' => 'mod/assign:grade',
-        ),
-        'feedback' => array(
-            // Breaks if anonymous feedback is collected.
-            'url' => '/mod/feedback/show_entries.php?id=:cmid&do_show=showoneentry&userid=:userid',
-            'capability' => 'mod/feedback:viewreports',
-        ),
-        'lesson' => array(
-            'url' => '/mod/lesson/report.php?id=:cmid&action=reportdetail&userid=:userid',
-            'capability' => 'mod/lesson:viewreports',
-        ),
-        'quiz' => array(
-            'url' => '/mod/quiz/report.php?id=:cmid&mode=overview',
-            'capability' => 'mod/quiz:viewreports',
-        ),
-    );
-
-    if ($CFG->version > 2015111604) {
-        $alternatelinks['assign']['url'] = '/mod/assign/view.php?id=:cmid&action=grade&userid=:userid';
-    }
-
-    return $alternatelinks;
-}
-
-/**
  * Returns the activities with completion set in current course
  *
  * @param int    courseid   ID of the course
@@ -167,7 +123,7 @@ function block_completion_progress_modules_with_alternate_links() {
  * @param string forceorder An override for the course order setting
  * @return array Activities with completion settings in the course
  */
-function block_completion_progress_get_activities($courseid, $config = null, $forceorder = null) {
+function block_courses_available_get_activities($courseid, $config = null, $forceorder = null) {
     $modinfo = get_fast_modinfo($courseid, -1);
     $sections = $modinfo->get_sections();
     $activities = array();
@@ -201,9 +157,9 @@ function block_completion_progress_get_activities($courseid, $config = null, $fo
 
     // Sort by first value in each element, which is time due.
     if ($forceorder == 'orderbycourse' || ($config && $config->orderby == 'orderbycourse')) {
-        usort($activities, 'block_completion_progress_compare_events');
+        usort($activities, 'block_courses_available_compare_events');
     } else {
-        usort($activities, 'block_completion_progress_compare_times');
+        usort($activities, 'block_courses_available_compare_times');
     }
 
     return $activities;
@@ -216,7 +172,7 @@ function block_completion_progress_get_activities($courseid, $config = null, $fo
  * @param array $b array of event information
  * @return <0, 0 or >0 depending on order of activities/resources on course page
  */
-function block_completion_progress_compare_events($a, $b) {
+function block_courses_available_compare_events($a, $b) {
     if ($a['section'] != $b['section']) {
         return $a['section'] - $b['section'];
     } else {
@@ -231,7 +187,7 @@ function block_completion_progress_compare_events($a, $b) {
  * @param array $b array of event information
  * @return <0, 0 or >0 depending on time then order of activities/resources
  */
-function block_completion_progress_compare_times($a, $b) {
+function block_courses_available_compare_times($a, $b) {
     if (
         $a['expected'] != 0 &&
         $b['expected'] != 0 &&
@@ -243,7 +199,7 @@ function block_completion_progress_compare_times($a, $b) {
     } else if ($a['expected'] == 0 && $b['expected'] != 0) {
         return 1;
     } else {
-        return block_completion_progress_compare_events($a, $b);
+        return block_courses_available_compare_events($a, $b);
     }
 }
 
@@ -255,7 +211,7 @@ function block_completion_progress_compare_times($a, $b) {
  * @param string $courseid the course for filtering visibility
  * @return array The array with restricted activities removed
  */
-function block_completion_progress_filter_visibility($activities, $userid, $courseid) {
+function block_courses_available_filter_visibility($activities, $userid, $courseid) {
     global $CFG;
     $filteredactivities = array();
     $modinfo = get_fast_modinfo($courseid, $userid);
@@ -309,7 +265,7 @@ function block_completion_progress_filter_visibility($activities, $userid, $cour
  * @param array $submissions Submissions by the user
  * @return array   an describing the user's attempts based on module+instance identifiers
  */
-function block_completion_progress_completions($activities, $userid, $course, $submissions) {
+function block_courses_available_completions($activities, $userid, $course, $submissions) {
     $completions = array();
     $completion = new completion_info($course);
     $cm = new stdClass();
@@ -338,7 +294,7 @@ function block_completion_progress_completions($activities, $userid, $course, $s
  * @param bool     $simple      Controls whether instructions are shown below a progress bar
  * @return string json 
  */
-function block_completion_progress_json($activities, $completions, $config, $userid, $courseid, $instance, $simple = false) {
+function block_courses_available_json($activities, $completions, $config, $userid, $courseid, $instance, $simple = false) {
     global $OUTPUT, $USER;
     
     // create a json array of activities
@@ -358,9 +314,6 @@ function block_completion_progress_json($activities, $completions, $config, $use
     
     $progress['colors'] = $colors;
 
-    // Determine links to activities.
-    $alternatelinks = block_completion_progress_modules_with_alternate_links();
-    
     $numactivities = count($activities);
     
     for ($i = 0; $i < $numactivities; $i++) {
@@ -391,12 +344,6 @@ function block_completion_progress_json($activities, $completions, $config, $use
         
         $activity_details['name'] = s($activity['name']);
         
-        if (!empty($activity['link']) && (!empty($activity['available']) || $simple)) {
-            $activity_details['link'] = $activity['link'];
-        } else {
-            $activity_details['link'];
-        }
-        
         $activity_details['status'] = '';
         
         if ($completed == COMPLETION_COMPLETE) {
@@ -426,15 +373,4 @@ function block_completion_progress_json($activities, $completions, $config, $use
     $data = json_encode($progress);
     
     return $data;
-}
-
-/**
- * Checks whether the current page is the My home page.
- *
- * @return bool True when on the My home page.
- */
-function block_completion_progress_on_site_page() {
-    global $SCRIPT, $COURSE;
-
-    return $SCRIPT === '/my/index.php' || $COURSE->id == 1;
 }
