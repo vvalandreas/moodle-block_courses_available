@@ -23,12 +23,13 @@
  */
 
 $string['configtitle'] = 'Courses taken';
+$string['config_default_title'] = 'Courses available';
 $string['pluginname'] = 'Courses available';
 $string['sfhcoursestaken'] = 'Courses started/completed';
 $string['fullnamedisplay'] = 'Courses started';
 $string['coursename'] = 'Name';
 $string['status'] = 'Status';
-$string['notstarted'] = 'Not started';
+$string['startcourse'] = 'Start course';
 $string['coursestatus'] = 'Course status';
 $string['complete'] = 'Complete';
 $string['inprogress'] = 'In progress';
@@ -43,3 +44,5 @@ $string['retakecourse'] = 'Start course again';
 $string['description'] = 'Description';
 $string['completed'] = 'completed';
 $string['viewlearnersprogress'] = 'View progress';
+$string['nocourses'] = 'There are no courses to list here';
+$string['completion_not_enabled'] = 'Completion tracking is not enabled';
