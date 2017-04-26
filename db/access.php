@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') or die();
 
 $capabilities = array (
-    'block/completion_progress:addinstance' => array(
+    'block/courses_available:addinstance' => array(
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'write',
         'contextlevel' => CONTEXT_BLOCK,
@@ -38,7 +38,7 @@ $capabilities = array (
         'clonepermissionsfrom' => 'moodle/site:manageblocks'
     ),
 
-    'block/completion_progress:myaddinstance' => array(
+    'block/courses_available:myaddinstance' => array(
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,
