@@ -46,3 +46,6 @@ $string['completed'] = 'completed';
 $string['viewlearnersprogress'] = 'View progress';
 $string['nocourses'] = 'There are no courses to list here';
 $string['completion_not_enabled'] = 'Completion tracking is not enabled';
+$string['coursepage'] = 'Enter course';
+$string['homepage'] = 'Return to dashboard';
+$string['courseinfoheading'] = 'Course information';
