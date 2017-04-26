@@ -43,6 +43,6 @@ defined('MOODLE_INTERNAL') or die();
  * @param int $oldversion
  * @param object $block
  */
-function xmldb_block_completion_progress_upgrade($oldversion, $block) {
+function xmldb_block_courses_available_upgrade($oldversion, $block) {
     return true;
 }
