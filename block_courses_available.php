@@ -151,6 +151,8 @@ class block_courses_available extends block_base {
                 $courseinstances[] = $courseinstance;
             }
         }
+        
+        $renderer = $this->page->get_renderer('block_courses_available');
                   
         if (!empty($courseinstances)) {
             $toStartTable = array();
@@ -167,21 +169,12 @@ class block_courses_available extends block_base {
                 
                 $row = array();
                 
-                $row [] = $course->fullname;
+                $row[] = $renderer->get_course_title($course->fullname);
                 
-                if (isset($course->summary)) {
-                    $link = new moodle_url($CFG->wwwroot.'/blocks/courses_available/overview.php?id='.$course->id);
-                    $buttonString = get_string('description', 'block_courses_available');
-                    $button = new single_button($link, $buttonString, 'get');
-                    $button->class = 'tablebutton';
-                    $row[] = $OUTPUT->render($button);
-                } else {
-                    $row[] = '-';
-                }
+                $row[] = $renderer->get_summary($course);
                 
                 $submissions = block_courses_available_student_submissions($course->id, $USER->id);
-                $completions = block_courses_available_completions($courseinstance->activities, $USER->id, $course,
-                    $submissions);
+                $completions = block_courses_available_completions($courseinstance->activities, $USER->id, $course, $submissions);
                 
                 $json = block_courses_available_json(
                         $courseinstance->activities,
@@ -193,21 +186,9 @@ class block_courses_available extends block_base {
                 
                 $completion_data = json_decode($json);
                 
-                $url = new moodle_url($CFG->wwwroot.'/course/view.php', array('id'=>$course->id));
+                $row[] = $renderer->get_course_link($course, $completion_data);
                 
                 $progress = intval($completion_data->percentage);
-                
-                if ($progress == 100) {
-                    $buttonString = get_string('retakecourse', 'block_courses_available');
-                } elseif ($progress == 0) {
-                    $buttonString = get_string('startcourse', 'block_courses_available');
-                } else {
-                    $buttonString = get_string('continuecourse', 'block_courses_available');
-                }
-                $button = new single_button($url, $buttonString, 'get');
-                $button->class = 'tablebutton';
-                
-                $row[] = $OUTPUT->render($button);
                 
                 if ($progress == 100) {
                     $completedTable[] = $row;
