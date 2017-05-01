@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die;
 require_once($CFG->dirroot.'/blocks/courses_available/lib.php');
 
 /**
- * Courses_available block rendrer
+ * Courses_available block renderer
  *
  * @copyright  2017 Ian Wild
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
