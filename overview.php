@@ -65,45 +65,8 @@ $PAGE->navbar->add(get_string('description', 'block_courses_available'));
 
 echo $OUTPUT->header();
 
-echo $OUTPUT->box_start('generalbox summaryinfo');
+$renderer = $PAGE->get_renderer('block_courses_available');
 
-echo format_text($course->summary, $course->summaryformat, array('overflowdiv'=>true), $course->id);
-
-if (!empty($CFG->coursecontact)) {
-    $coursecontactroles = explode(',', $CFG->coursecontact);
-    foreach ($coursecontactroles as $roleid) {
-        $role = $DB->get_record('role', array('id'=>$roleid));
-        $roleid = (int) $roleid;
-        if ($users = get_role_users($roleid, $context, true)) {
-            foreach ($users as $teacher) {
-                $fullname = fullname($teacher, has_capability('moodle/site:viewfullnames', $context));
-                $namesarray[] = format_string(role_get_name($role, $context)).': <a href="'.$CFG->wwwroot.'/user/view.php?id='.
-                        $teacher->id.'&amp;course='.SITEID.'">'.$fullname.'</a>';
-            }
-        }
-    }
-    
-    if (!empty($namesarray)) {
-        echo "<ul class=\"teachers\">\n<li>";
-        echo implode('</li><li>', $namesarray);
-        echo "</li></ul>";
-    }
-}
-
-
-echo $OUTPUT->box_end();
-
-/*
- * button box
- */
-$buttonBox = $OUTPUT->box_start('generalbox icons');
-$cancel = new single_button(new moodle_url($CFG->wwwroot.'/my'), get_string('homepage', 'block_courses_available'), 'get');
-$url = new moodle_url($CFG->wwwroot.'/course/view.php', array('id'=>$course->id));
-$continue = new single_button($url, get_string('coursepage', 'block_courses_available'), 'get');
-
-$attr = array('id'=>'summarybuttons','class' => 'buttons');
-$buttonBox .= html_writer::tag('div', $OUTPUT->render($continue).$OUTPUT->render($cancel), $attr);
-$buttonBox .= $OUTPUT->box_end();
-echo $buttonBox;
+echo $renderer->get_overview($course);
 
 echo $OUTPUT->footer();
