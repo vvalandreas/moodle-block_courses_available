@@ -23,6 +23,8 @@
  */
 defined('MOODLE_INTERNAL') || die;
 
+require_once($CFG->dirroot.'/blocks/courses_available/lib.php');
+
 /**
  * Courses_available block rendrer
  *
@@ -52,14 +54,14 @@ class block_courses_available_renderer extends plugin_renderer_base {
         $html = '-';
         
         if(isset($course->summary)) {
-            global $OUTPUT, $CFG;
+            global $CFG;
             
             $link = new moodle_url($CFG->wwwroot.'/blocks/courses_available/overview.php?id='.$course->id);
             $buttonString = get_string('description', 'block_courses_available');
             $button = new single_button($link, $buttonString, 'get');
             $button->class = 'tablebutton';
             
-            $html = $OUTPUT->render($button);
+            $html = $this->output->render($button);
         }
         return $html;
     }
@@ -72,7 +74,7 @@ class block_courses_available_renderer extends plugin_renderer_base {
      * @return string
      */
     public function get_course_link($course, $completion_data) {
-        global $CFG, $OUTPUT; 
+        global $CFG; 
         
         $html = '';
         
@@ -90,7 +92,59 @@ class block_courses_available_renderer extends plugin_renderer_base {
         $button = new single_button($url, $buttonString, 'get');
         $button->class = 'tablebutton';
         
-        $html = $OUTPUT->render($button);
+        $html = $this->output->render($button);
+        
+        return $html;
+    }
+    
+    public function get_overview($course) {
+        global $CFG, $DB;
+        
+        $html = '';
+        
+        $html .= $this->output->box_start('generalbox summaryinfo');
+        
+        $html .= format_text($course->summary, $course->summaryformat, array('overflowdiv'=>true), $course->id);
+        
+        if (!empty($CFG->coursecontact)) {
+            $context = context_course::instance($course->id);
+            
+            $coursecontactroles = explode(',', $CFG->coursecontact);
+            foreach ($coursecontactroles as $roleid) {
+                $role = $DB->get_record('role', array('id'=>$roleid));
+                $roleid = (int) $roleid;
+                
+                if ($users = get_role_users($roleid, $context, true)) {
+                    foreach ($users as $teacher) {
+                        $fullname = fullname($teacher, has_capability('moodle/site:viewfullnames', $context));
+                        $namesarray[] = format_string(role_get_name($role, $context)).': <a href="'.$CFG->wwwroot.'/user/view.php?id='.
+                                $teacher->id.'&amp;course='.SITEID.'">'.$fullname.'</a>';
+                    }
+                }
+            }
+            
+            if (!empty($namesarray)) {
+                $html .= "<ul class=\"teachers\">\n<li>";
+                $html .= implode('</li><li>', $namesarray);
+                $html .= "</li></ul>";
+            }
+        }
+        
+        
+        $html .= $this->output->box_end();
+        
+        /*
+         * button box
+         */
+        $buttonBox = $this->output->box_start('generalbox icons');
+        $cancel = new single_button(new moodle_url($CFG->wwwroot.'/my'), get_string('homepage', 'block_courses_available'), 'get');
+        $url = new moodle_url($CFG->wwwroot.'/course/view.php', array('id'=>$course->id));
+        $continue = new single_button($url, get_string('coursepage', 'block_courses_available'), 'get');
+        
+        $attr = array('id'=>'summarybuttons','class' => 'buttons');
+        $buttonBox .= html_writer::tag('div', $this->output->render($continue).$this->output->render($cancel), $attr);
+        $buttonBox .= $this->output->box_end();
+        $html .= $buttonBox;
         
         return $html;
     }
