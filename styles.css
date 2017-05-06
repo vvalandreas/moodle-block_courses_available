@@ -1,7 +1,3 @@
-#page-block-courses_available-overview #summary_buttons {
-    display: inline;
-}
-
-#page-block-courses_available-overview #summary_buttons {
-	display: inline-flex;
+#page-blocks-courses_available-overview div.single_button {
+    display: inline-block;
 }
