@@ -37,16 +37,17 @@
     }
 }}
 
-<div class="box generalbox summaryinfo">
-    <div class="no-overflow">
-        {{{summary}}}
+<div class="block_courses_available_overview">
+    <div class="box generalbox summaryinfo">
+        <div class="no-overflow">
+            {{{summary}}}
+        </div>
     </div>
+    
+    <ul class="teachers">
+        {{#names}}
+        <li>{{{.}}}</li>
+        {{/names}}
+    </ul>       
+    {{{buttons}}}    
 </div>
-
-<ul class="teachers">
-    {{#names}}
-    <li>{{{.}}}</li>
-    {{/names}}
-</ul>       
-{{{buttons}}}    
-
