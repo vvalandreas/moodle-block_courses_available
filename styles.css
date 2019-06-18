@@ -5,3 +5,7 @@
 #page-block-courses_available-overview #summary_buttons {
 	display: inline-flex;
 }
+
+.hello {
+    color: aqua;
+}
